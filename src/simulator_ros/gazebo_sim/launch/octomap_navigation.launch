@@ -1,0 +1,57 @@
+<launch>
+  <!-- Add social force model plugin -->
+  <!-- <env name="GAZEBO_MODEL_PATH" value="${GAZEBO_MODEL_PATH}:$(find gazebo_sfm_plugin)/media/models"/>
+  <env name="GAZEBO_RESOURCE_PATH" value="${GAZEBO_RESOURCE_PATH}:$(find gazebo_sfm_plugin)/media/models"/> -->
+
+  <!-- Add Bookstore -->
+  <!-- <env name="GAZEBO_MODEL_PATH" value="${GAZEBO_MODEL_PATH}:$(find gazebo_sim)/gazebo_models/bookstore/models"/> -->
+  <!-- <env name="GAZEBO_RESOURCE_PATH" value="${GAZEBO_RESOURCE_PATH}:$(find gazebo_sim)/gazebo_models/bookstore/models"/> -->
+
+  <arg name="world_name" default="fastrlap1.world" />
+
+  <!-- Add maze gazebo environment-->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find gazebo_sim)/worlds/$(arg world_name)"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <include file="$(find scout_gazebo_sim)/launch/spawn_scout_mini.launch">
+    <arg name="x" value="0.0"/>
+    <arg name="y" value="0.0"/>
+  </include>
+
+  <include file="$(find scout_base)/launch/scout_mini_base.launch">
+  </include>
+
+  <include file="$(find scout_filter)/launch/ekf_filter_cmd.launch">
+  </include>
+  
+  <!-- AMCL -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find gazebo_sim)/maps/fastrlap.yaml" />
+
+  <node name="amcl" pkg="amcl" type="amcl" output="screen">
+      <remap from="scan" to="/hokuyo/scan" />
+      <remap from="odom" to="/odometry/filtered" />
+
+      <param name="use_map_topic" value="true" />
+      <param name="odom_frame_id" value="odom" />
+      <param name="base_frame_id" value="base_link" />
+      <param name="global_frame_id" value="map" />
+      <param name="update_min_d" value="0.2" />
+      <param name="update_min_a" value="0.2" />
+      <param name="min_particles" value="500" />
+      <param name="max_particles" value="2000" />
+      <param name="laser_max_beams" value="60" />
+      <param name="laser_max_range" value="10.0" />
+      <param name="gui_publish_rate" value="10.0" />
+      <param name="save_pose_rate" value="0.5" />
+  </node>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find gazebo_sim)/config/nav.rviz" output="screen" />
+
+
+</launch>
