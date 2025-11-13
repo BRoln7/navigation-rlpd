@@ -5,8 +5,8 @@
 
 ## simulator and visulization
 
-![gazebo](./assets/gazebo.png)
-![rviz](./assets/rviz.png)
+<img src="./assets/gazebo.png" width=300/>
+<img src="./assets/rviz.png" width=300/>
 
 ## RLPD training Results
 
